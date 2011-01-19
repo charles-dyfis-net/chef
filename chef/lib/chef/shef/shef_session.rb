@@ -165,6 +165,7 @@ module Shef
     def rebuild_node
       # Tell the client we're chef solo so it won't try to contact the server
       Chef::Config[:solo] = true
+      Chef::Cookbook::FileVendor.on_create { |manifest| Chef::Cookbook::FileSystemFileVendor.new(manifest) }
       @client = Chef::Client.new
       @client.run_ohai
       @client.build_node
@@ -185,6 +186,7 @@ module Shef
     def rebuild_node
       # Make sure the client knows this is not chef solo
       Chef::Config[:solo] = false
+      Chef::Cookbook::FileVendor.on_create { |manifest| Chef::Cookbook::RemoteFileVendor.new(manifest, @rest) }
       @client = Chef::Client.new
       @client.run_ohai
       @client.register
